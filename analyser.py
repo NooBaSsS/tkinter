@@ -124,12 +124,3 @@ class TextAnalyser:
         plt.axis('off')
         plt.savefig('wordcloud.png', format='PNG')
         plt.show()
-
-
-test = TextAnalyser(file_path='text.txt',
-                    encoding='UTF-8',
-                    pos=['VERB', 'ADJF', 'NOUN', 'ADVB'],
-                    contour_color='black',
-                    bgc='white',
-                    contour_width=3,
-                    )
