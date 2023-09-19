@@ -1,126 +1,97 @@
 from typing import NoReturn
 import re
-import pymorphy3
+from pymorphy3 import MorphAnalyzer
+from wordcloud import WordCloud
 from collections import Counter
-from PIL import Image
-from wordcloud import WordCloud, STOPWORDS
-import numpy as np
-import matplotlib.pyplot as plt
 
 
 class TextAnalyser:
-    def __init__(self,
-                 file_path=None,
-                 mode='r',
-                 encoding='UTF-8',
-                 pos=['NOUN', None, None, None],
-                 contour_color='black',
-                 bgc='white',
-                 contour_width=3,
-                 max_words=500,
-                 figsize=[10, 7]
-                 ) -> None:
-        if file_path is None:
-            raise Exception('Файл не указан')
-        self.text = file_path
-        self.encoding = encoding
-        self.open_file(file_path)
-        self.check_empty(file_path)
-        self.prepare_text()
-        self.make_analysed_words(pos)
-        self.make_wordcloud(contour_color=contour_color,
-                            bgc=bgc,
-                            contour_width=contour_width,
-                            max_words=max_words,
-                            figsize=figsize
-                            )
+    def __init__(
+                self,
+                source_file=None,
+                destination_file="wordcloud.png",
+                parts_of_speech=["NOUN"],
+                words_ammount=100,
+                wc_width=800,
+                wc_height=600,
+                wc_background="black",
+                wc_margin=10
+    ) -> None:
+        """ вызывает цепочку методов """
+        if source_file is None:
+            raise Exception("Не указан файл для анализа!")
+        self.source_file = source_file
+        self.destination_file = destination_file
+        self.read_file()
+        self.check_empty_file()
+        self.make_words()
+        self.make_pos_words(parts_of_speech)
+        self.make_top_words(words_ammount)
+        self.make_wordcloud(wc_width, wc_height, wc_background, wc_margin)
+        self.save_to_file()
         self.print_results()
 
-    def open_file(self, file_path) -> None | NoReturn:
+    def read_file(self) -> None | NoReturn:
+        """ пытается открыть файл и считать его в строку """
         try:
-            with open(self.text, 'r', encoding=self.encoding) as text:
-                self.text = text
-                self.text = self.text.read()
+            with open(self.source_file, "r", encoding="UTF-8") as file:
+                self.file = file
+                self.text = self.file.read()
         except FileNotFoundError:
-            raise Exception(f'Файл "{file_path}" не найден')
-        self.mask = np.array(Image.open('mask.jpg'))
+            raise Exception(f"Файл {self.source_file} не найден!")
 
-    def prepare_text(self) -> None:
-        self.text = self.text.lower()
-        self.words = re.findall(r'\w+[\w-]*\w+', self.text)
-        word_counts = Counter(self.words)
-        self.sorted_words = sorted(
-            word_counts.items(), key=lambda item: item[1], reverse=True
-        )
-
-    def check_empty(self, file_path) -> None | NoReturn:
+    def check_empty_file(self) -> None | NoReturn:
+        """ проверяет пустой ли файл """
         if not self.text:
-            raise RuntimeError(f'Файл "{file_path}" пустой')
+            raise RuntimeError(f"Файл {self.source_file} пуст! Попробуйте другой файл.")
+
+    def make_words(self) -> None:
+        """ делает буквы текста строчными, создает список слов """
+        self.text = self.text.lower()
+        self.words = re.findall(r"\b[а-яё-]+\b", self.text)
+
+    def make_pos_words(self, parts_of_speech) -> None:
+        """ делает список из подходящих частей речи """
+        morph = MorphAnalyzer()
+        self.pos_words = []
+        for word in self.words:
+            parses = morph.parse(word)
+            parse = parses[0]
+            if any(pos in parse.tag for pos in parts_of_speech):
+                self.pos_words.append(parse.normal_form)
+        if not self.pos_words:
+            raise RuntimeError("В тексте не нашлось подходящих частей речи.")
+
+    def make_top_words(self, words_ammount):
+        """
+        создает словарь вида:
+        слово: количество упоминаний
+        """
+        self.pos_words
+        counter = Counter(self.pos_words)
+        self.counted_words = dict(counter.most_common(words_ammount))
+
+    def make_wordcloud(self, wc_width, wc_height, wc_background, wc_margin) -> None:
+        """ создает объект облака слов """
+        self.wordcloud = WordCloud(
+            width=wc_width,
+            height=wc_height,
+            background_color=wc_background,
+            margin=wc_margin,
+            scale=2
+        ).generate_from_frequencies(self.counted_words)
+
+    def save_to_file(self) -> None:
+        """ сохраняет объект облака слов в файл-изображение """
+        try:
+            self.wordcloud.to_file(self.destination_file)
+        except:
+            raise RuntimeError(
+                "Не удалось сохранить изображение облака слов в файл!"
+            )
 
     def print_results(self) -> None:
-        print(self.result)
-        for i, result in enumerate(self.additional_results):
-            if result:
-                print(f'{i+1}-я часть речи: {result}')
-        print(f'рейтинг из 10 слов: {self.sorted_words[:10]}')
-
-    def make_analysed_words(self,
-                            pos=['NOUN', None, None, None],
-                            ) -> None:
-        if not self.words:
-            raise Exception('Текста нет')
-        for p in pos:
-            if p not in pos:
-                raise Exception(f'Неправильная часть речи: {p}')
-        morph = pymorphy3.MorphAnalyzer()
-
-        self.result = []
-        self.additional_results = [[] for _ in range(len(pos) - 1)]
-
-        for word in self.words:
-            parse = morph.parse(word)[0]
-            if parse.tag.POS == pos[0]:
-                self.result.append(morph.parse(word)[0].normal_form)
-            else:
-                for i, p in enumerate(pos[1:], start=1):
-                    if parse.tag.POS == p:
-                        self.additional_results[i-1].append(
-                            morph.parse(word)[0].normal_form
-                        )
-
-    def make_wordcloud(self,
-                       contour_color='black',
-                       bgc='white',
-                       contour_width=3,
-                       max_words=500,
-                       figsize=[10, 7],
-                       ):
-        wc = WordCloud(
-            background_color=bgc,
-            max_words=max_words,
-            mask=self.mask,
-            stopwords=set(STOPWORDS),
-            contour_width=contour_width,
-            contour_color=contour_color
-        )
-        wc.generate(' '.join(self.words))
-        num_colors = len(wc.words_)
-        rand_cmap = plt.cm.get_cmap('hsv', num_colors)
-
-        def random_color_func(word=None,
-                              font_size=None,
-                              position=None,
-                              orientation=None,
-                              font_path=None,
-                              random_state=None
-                              ):
-            return tuple(int(x * 255) for x in rand_cmap(
-                np.random.randint(num_colors)
-            ))
-
-        plt.figure(figsize=figsize)
-        plt.imshow(wc.recolor(color_func=random_color_func),
-                   interpolation='bilinear')
-        plt.axis('off')
-        plt.savefig('wordcloud.png', format='PNG')
-        plt.show()
+        """ выводит отчет на экран """
+        print(f"В этом тексте {len(self.words)} слов")
+        print(f"Подходящих частей речи: {len(self.pos_words)}")
+        print(f"Изображение сохранено в файл {self.destination_file}")

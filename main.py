@@ -2,14 +2,8 @@ import tkinter as tk
 import analyser
 
 '''
-analyser.TextAnalyser(file_path=file_path.get(),
-                          encoding='UTF-8',
-                          pos=pos,
-                          contour_color=color.get(),
-                          bgc=bgc.get(),
-                          contour_width=int(contour_width.get()),
-                          max_words=int(words_ammount.get())
-                          )
+TextAnalyser(source_file="text.txt",
+            parts_of_speech=["NOUN", "VERB"])
 '''
 
 
@@ -23,10 +17,18 @@ def run():
         pos.append(NOUN_1.get())
 
     print(pos)
+    analyser.TextAnalyser(source_file=file_path.get(),
+                          parts_of_speech=["NOUN", "VERB"],
+                          destination_file="wordcloud.png",
+                          words_ammount=int(words_ammount.get()),
+                          wc_width=int(width.get()),
+                          wc_height=int(height.get()),
+                          wc_background=bgc.get(),
+                          )
 
 
 window = tk.Tk()
-window.title('a')
+window.title('test')
 window.geometry('300x300')
 VERB_1 = tk.StringVar()
 VERB = tk.Checkbutton(window, text='VERB', onvalue='VERB', offvalue='', variable=VERB_1)
@@ -35,16 +37,16 @@ ADJF = tk.Checkbutton(window, text='ADJF', onvalue='ADJF', offvalue='', variable
 NOUN_1 = tk.StringVar()
 NOUN = tk.Checkbutton(window, text='NOUN', onvalue='NOUN', offvalue='', variable=NOUN_1)
 ADVB = tk.Checkbutton(window, text='ADVB', onvalue='ADVB')
-button = tk.Button(text='a', command=run)
+button = tk.Button(text='test', command=run)
 words_ammount = tk.Entry(window)
-color = tk.Entry(window)
 bgc = tk.Entry(window)
 file_path = tk.Entry(window)
-contour_width = tk.Entry(window)
+width = tk.Entry(window)
+height = tk.Entry(window)
 file_path.pack()
-color.pack()
+width.pack()
+height.pack()
 bgc.pack()
-contour_width.pack()
 words_ammount.pack()
 
 VERB.pack()
