@@ -43,7 +43,9 @@ class TextAnalyser:
     def check_empty_file(self) -> None | NoReturn:
         """ проверяет пустой ли файл """
         if not self.text:
-            raise RuntimeError(f"Файл {self.source_file} пуст! Попробуйте другой файл.")
+            raise RuntimeError(
+                f"Файл {self.source_file} пуст! Попробуйте другой файл."
+                )
 
     def make_words(self) -> None:
         """ делает буквы текста строчными, создает список слов """
@@ -71,7 +73,8 @@ class TextAnalyser:
         counter = Counter(self.pos_words)
         self.counted_words = dict(counter.most_common(words_ammount))
 
-    def make_wordcloud(self, wc_width, wc_height, wc_background, wc_margin) -> None:
+    def make_wordcloud(self, wc_width, wc_height, wc_background,
+                       wc_margin) -> None:
         """ создает объект облака слов """
         self.wordcloud = WordCloud(
             width=wc_width,
@@ -95,3 +98,6 @@ class TextAnalyser:
         print(f"В этом тексте {len(self.words)} слов")
         print(f"Подходящих частей речи: {len(self.pos_words)}")
         print(f"Изображение сохранено в файл {self.destination_file}")
+
+
+'''TextAnalyser(source_file="text.txt", parts_of_speech=["NOUN", "VERB"])'''

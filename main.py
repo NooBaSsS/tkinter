@@ -31,11 +31,14 @@ window = tk.Tk()
 window.title('test')
 window.geometry('300x300')
 VERB_1 = tk.StringVar()
-VERB = tk.Checkbutton(window, text='VERB', onvalue='VERB', offvalue='', variable=VERB_1)
+VERB = tk.Checkbutton(window, text='VERB', onvalue='VERB', offvalue='',
+                      variable=VERB_1)
 ADJF_1 = tk.StringVar()
-ADJF = tk.Checkbutton(window, text='ADJF', onvalue='ADJF', offvalue='', variable=ADJF_1)
+ADJF = tk.Checkbutton(window, text='ADJF', onvalue='ADJF', offvalue='',
+                      variable=ADJF_1)
 NOUN_1 = tk.StringVar()
-NOUN = tk.Checkbutton(window, text='NOUN', onvalue='NOUN', offvalue='', variable=NOUN_1)
+NOUN = tk.Checkbutton(window, text='NOUN', onvalue='NOUN', offvalue='',
+                      variable=NOUN_1)
 ADVB = tk.Checkbutton(window, text='ADVB', onvalue='ADVB')
 button = tk.Button(text='test', command=run)
 words_ammount = tk.Entry(window)
@@ -58,9 +61,3 @@ button.pack()
 
 
 window.mainloop()
-
-'''
-не запускается на main.py
-запускается на & C:/Users/username/AppData/Local/Programs/Python/Python311/python.exe "c:/Users/username/Desktop/Новая папка (2)/main.py" в PS
-запускается на C:/Users/username/AppData/Local/Programs/Python/Python311/python.exe "c:/Users/username/Desktop/Новая папка (2)/main.py" в cmd
-'''
