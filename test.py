@@ -1,4 +1,5 @@
 import tkinter
+from tkinter import ttk
 from tkinter import filedialog as fd
 from tkinter import colorchooser
 import analyser
@@ -6,12 +7,13 @@ import analyser
 
 window = tkinter.Tk()
 window.title('test')
-window.geometry('550x420')
+window.geometry('550x500')
+length = None
 
 
 def select_file():
     filename = fd.askopenfilename()
-    file_label['text'] = 'файл: ' + filename
+    file_label['text'] = filename
 
 
 def select_color():
@@ -89,6 +91,7 @@ words_ammount = tkinter.Entry(window)
 width = tkinter.Entry(window)
 height = tkinter.Entry(window)
 make_wordcloud = tkinter.Button(window, text='создать', command=run)
+bar = ttk.Progressbar(length=100, orient='vertical')
 
 
 file_label.grid(column=0, row=0)
@@ -106,6 +109,7 @@ words_ammount.grid(column=1, row=6)
 col = -1
 row = 7
 
+
 # Create checkbuttons for each POS tag
 for pos in pos_tags:
     if col != 2:
@@ -121,7 +125,14 @@ for pos in pos_tags:
     pos_checkbutton.grid(column=col, row=row)
 
 
-make_wordcloud.grid(pady=15, columnspan=3, rowspan=3, sticky='we', ipady=15)
+make_wordcloud.grid(pady=15,
+                    columnspan=3,
+                    rowspan=3,
+                    sticky='we',
+                    ipady=15,
+                    row=13,
+                    )
+bar.grid(column=3, row=13, padx=20)
 
 
 window.mainloop()
