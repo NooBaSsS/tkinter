@@ -2,6 +2,7 @@ import tkinter
 from tkinter import ttk
 from tkinter import filedialog as fd
 from tkinter import colorchooser
+from tkinter.messagebox import showwarning, showinfo
 import analyser
 
 
@@ -12,12 +13,18 @@ length = None
 
 
 def select_file():
-    filename = fd.askopenfilename()
+    filename = fd.askopenfilename(
+        initialdir='./',
+        filetypes=[
+            ('text documents', '.txt')
+        ],
+        title='выберите файл'
+    )
     file_label['text'] = filename
 
 
 def select_color():
-    color = colorchooser.askcolor()
+    color = colorchooser.askcolor(title='выберите цвет')
     color_label['text'] = color[1]
     color_square['bg'] = color[1]
 
@@ -25,6 +32,21 @@ def select_color():
 def run():
     color = color_label['text']
     file = file_label['text']
+    if file == 'файл:':
+        showwarning(title='выберите файл', message='выберите файл')
+        return
+    if not width.get():
+        showwarning(title='выберите ширину', message='выберите ширину')
+        return
+    if not height.get():
+        showwarning(title='выберите высоту', message='выберите высоту')
+        return
+    if not words_ammount.get():
+        showwarning(
+            title='выберите количество слов',
+            message='выберите количество слов'
+        )
+        return
     analyser.TextAnalyser(source_file=file,
                           parts_of_speech=generate_pos(),
                           destination_file="wordcloud.png",
@@ -33,6 +55,7 @@ def run():
                           wc_height=int(height.get()),
                           wc_background=color,
                           )
+    showinfo(title='создано', message='картинка создана')
 
 
 # Create a list of possible POS tags
@@ -107,12 +130,13 @@ words_label.grid(column=0, row=6, pady=15)
 words_ammount.grid(column=1, row=6)
 
 col = -1
+max_col = 2
 row = 7
 
 
 # Create checkbuttons for each POS tag
 for pos in pos_tags:
-    if col != 2:
+    if col != max_col:
         col += 1
     else:
         col = 0
