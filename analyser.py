@@ -81,7 +81,7 @@ class TextAnalyser:
             height=wc_height,
             background_color=wc_background,
             margin=wc_margin,
-            scale=2
+            scale=1
         ).generate_from_frequencies(self.counted_words)
 
     def save_to_file(self) -> None:

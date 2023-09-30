@@ -32,6 +32,7 @@ def select_color():
 def run():
     color = color_label['text']
     file = file_label['text']
+    pos = generate_pos()
     if file == 'файл:':
         showwarning(title='выберите файл', message='выберите файл')
         return
@@ -47,15 +48,30 @@ def run():
             message='выберите количество слов'
         )
         return
-    analyser.TextAnalyser(source_file=file,
-                          parts_of_speech=generate_pos(),
-                          destination_file="wordcloud.png",
-                          words_ammount=int(words_ammount.get()),
-                          wc_width=int(width.get()),
-                          wc_height=int(height.get()),
-                          wc_background=color,
-                          )
-    showinfo(title='создано', message='картинка создана')
+    if color == 'цвет:':
+        showwarning(title='выберите цвет', message='выберите цвет')
+    if not pos:
+        showwarning(title='выберите часть речи', message='выберите часть речи')
+        return
+    destination_file = fd.asksaveasfile(
+                                        mode='w',
+                                        defaultextension='*.png',
+                                        filetypes=[('PNG Image', '*.png')],
+                        )
+    t_analyser = analyser.TextAnalyser(source_file=file,
+                                       parts_of_speech=pos,
+                                       destination_file=destination_file.name,
+                                       words_ammount=int(words_ammount.get()),
+                                       wc_width=int(width.get()),
+                                       wc_height=int(height.get()),
+                                       wc_background=color,
+                                       )
+
+    showinfo(title='создано',
+             message=f'картинка создана в {destination_file.name} \n' +
+                     f'всего слов в тексте: {len(t_analyser.words)} \n' +
+                     f'всего подходящих слов: {len(t_analyser.pos_words)}',
+             )
 
 
 # Create a list of possible POS tags
